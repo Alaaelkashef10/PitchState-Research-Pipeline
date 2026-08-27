@@ -1,0 +1,19 @@
+schema_version = "0.1"
+project_name = "pitchstate"
+experiment_name = "phase0-smoke"
+seed = 7
+
+[runtime]
+frame_width = 100
+frame_height = 100
+sample_fps = 5.0
+min_players_per_team = 2
+
+[quality]
+minimum_calibration_confidence = 0.75
+maximum_reprojection_error = 0.05
+minimum_player_confidence = 0.50
+
+[logging]
+run_directory = "experiments/runs"
+level = "INFO"

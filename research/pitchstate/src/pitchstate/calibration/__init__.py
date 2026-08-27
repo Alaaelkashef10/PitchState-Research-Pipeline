@@ -1,0 +1,1 @@
+"""Pitch calibration and image-to-pitch contracts."""

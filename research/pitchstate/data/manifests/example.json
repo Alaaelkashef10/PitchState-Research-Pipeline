@@ -1,0 +1,33 @@
+{
+  "schema_version": "0.1",
+  "dataset_id": "soccernet-gsr",
+  "dataset_version": "access-pending",
+  "source_url": "https://www.soccer-net.org/tasks/game-state-reconstruction",
+  "license_or_access": "Public benchmark with access conditions to verify before download",
+  "status": "not_downloaded",
+  "local_root": "data/raw/soccernet-gsr",
+  "splits": [
+    {
+      "name": "train",
+      "partition": "official",
+      "games": [],
+      "notes": "Populate after access and split audit."
+    },
+    {
+      "name": "validation",
+      "partition": "official",
+      "games": [],
+      "notes": "Populate after access and split audit."
+    },
+    {
+      "name": "test",
+      "partition": "official",
+      "games": [],
+      "notes": "Populate after access and split audit."
+    }
+  ],
+  "notes": [
+    "This fixture intentionally contains no fabricated clip counts or local file hashes.",
+    "The official task page documents the benchmark scope and metric."
+  ]
+}

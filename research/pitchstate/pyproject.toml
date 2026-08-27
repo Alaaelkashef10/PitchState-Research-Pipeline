@@ -1,0 +1,12 @@
+[project]
+name = "pitchstate"
+version = "0.1.0"
+description = "Confidence-aware pitch-space reconstruction research foundation for broadcast football"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+pitchstate = "pitchstate.cli:main"
+
+[tool.pitchstate]
+schema_version = "0.1"

@@ -1,0 +1,1 @@
+"""Team and role classification contracts and implementations."""

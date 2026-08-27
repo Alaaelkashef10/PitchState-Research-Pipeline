@@ -1,0 +1,1 @@
+"""Object detection contracts and implementations."""

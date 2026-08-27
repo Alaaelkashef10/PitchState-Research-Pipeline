@@ -47,3 +47,9 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# PitchState research outputs and Python caches
+research/pitchstate/outputs/
+research/pitchstate/experiments/runs/
+research/pitchstate/**/__pycache__/
+research/pitchstate/.pytest_cache/
