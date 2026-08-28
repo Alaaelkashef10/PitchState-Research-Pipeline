@@ -16,6 +16,7 @@ from pitchstate.schema import (
     PipelineResult,
     TrackObservation,
 )
+from pitchstate.shots.interface import ShotBoundaryDetector
 from pitchstate.tactics.interface import TacticalAnalyzer
 from pitchstate.tracking.interface import Tracker
 
@@ -30,12 +31,26 @@ def run_pipeline(
     config: ProjectConfig,
     run_id: str,
     logger: ExperimentLogger | None = None,
+    shot_boundary_detector: ShotBoundaryDetector | None = None,
+    metadata: dict[str, object] | None = None,
 ) -> PipelineResult:
-    """Run one shot-local pipeline and preserve invalid states explicitly."""
+    """Run the pipeline and preserve shot boundaries and invalid states."""
 
     states: list[MatchState] = []
     current_shot_id = "shot-000"
+    previous_frame: Frame | None = None
     for frame in frames:
+        shot_boundary = bool(
+            previous_frame is not None
+            and shot_boundary_detector is not None
+            and shot_boundary_detector.is_boundary(previous_frame, frame)
+        )
+        if shot_boundary:
+            current_shot_id = f"shot-{len(states):03d}"
+            reset = getattr(tracker, "reset", None)
+            if callable(reset):
+                reset()
+
         detections = detector.detect(frame)
         observations = list(tracker.update(frame, detections, current_shot_id))
         classified: list[TrackObservation] = []
@@ -76,11 +91,15 @@ def run_pipeline(
             if observation.role in {"player", "goalkeeper"}
             and observation.team in {"team_a", "team_b"}
             and observation.confidence >= config.quality.minimum_player_confidence
+            and observation.team_confidence >= config.quality.minimum_team_confidence
+            and observation.role_confidence >= config.quality.minimum_role_confidence
             and observation.pitch_point is not None
         ]
         for team in ("team_a", "team_b"):
             if sum(observation.team == team for observation in eligible) < config.runtime.min_players_per_team:
                 reasons.append(f"TOO_FEW_PLAYERS_{team.upper()}")
+        if projected and not eligible:
+            reasons.append("NO_CONFIDENT_PLAYER_OBSERVATIONS")
 
         valid = not reasons
         shape = tuple(analyzer.analyze(eligible)) if valid else ()
@@ -90,6 +109,7 @@ def run_pipeline(
             calibration=calibration,
             players=tuple(projected),
             valid=valid,
+            shot_boundary=shot_boundary,
             abstention_reasons=tuple(reasons),
             team_shape=shape,
         )
@@ -102,7 +122,15 @@ def run_pipeline(
                     "valid": valid,
                     "detection_count": len(detections),
                     "track_count": len(observations),
+                    "shot_id": current_shot_id,
+                    "shot_boundary": shot_boundary,
                     "abstention_reasons": reasons,
                 },
             )
-    return PipelineResult(schema_version="0.1", run_id=run_id, states=tuple(states))
+        previous_frame = frame
+    return PipelineResult(
+        schema_version="0.1",
+        run_id=run_id,
+        states=tuple(states),
+        metadata=dict(metadata or {}),
+    )

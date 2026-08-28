@@ -25,6 +25,8 @@ class QualityConfig:
     minimum_calibration_confidence: float
     maximum_reprojection_error: float
     minimum_player_confidence: float
+    minimum_team_confidence: float
+    minimum_role_confidence: float
 
 
 @dataclass(frozen=True)
@@ -115,6 +117,18 @@ def load_config(path: str | Path) -> ProjectConfig:
         _bounded_float(
             _require(quality, "minimum_player_confidence", "quality"),
             "quality.minimum_player_confidence",
+            0.0,
+            1.0,
+        ),
+        _bounded_float(
+            _require(quality, "minimum_team_confidence", "quality"),
+            "quality.minimum_team_confidence",
+            0.0,
+            1.0,
+        ),
+        _bounded_float(
+            _require(quality, "minimum_role_confidence", "quality"),
+            "quality.minimum_role_confidence",
             0.0,
             1.0,
         ),

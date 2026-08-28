@@ -10,7 +10,7 @@ from typing import Sequence
 from pitchstate.config import load_config
 from pitchstate.datasets.manifest import load_manifest
 from pitchstate.logging_utils import ExperimentLogger
-from pitchstate.reproducibility import environment_metadata
+from pitchstate.reproducibility import code_revision, environment_metadata
 from pitchstate.smoke import run_smoke
 
 
@@ -42,13 +42,27 @@ def _run_smoke(config_path: Path, output_path: Path) -> int:
     )
     logger = ExperimentLogger(config.logging.run_directory, result.run_id)
     logger.event(
+        "run_started",
+        {
+            "project_name": config.project_name,
+            "experiment_name": config.experiment_name,
+            "seed": config.seed,
+            "config": config.to_dict(),
+            "dataset_id": result.metadata.get("dataset_id"),
+            "dataset_version": result.metadata.get("dataset_version"),
+            "model_version": result.metadata.get("model_version"),
+            "code_revision": code_revision(),
+            "environment": environment_metadata(),
+        },
+    )
+    logger.event(
         "run_completed",
         {
             "command": "smoke",
             "output": str(output_path),
             "state_count": len(result.states),
             "valid_state_count": sum(state.valid for state in result.states),
-            "environment": environment_metadata(),
+            "code_revision": code_revision(),
         },
     )
     print(f"Smoke run {result.run_id} wrote {output_path}")

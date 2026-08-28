@@ -77,3 +77,8 @@ Do not commit downloaded video, annotations, model weights, or generated caches.
 ## Research scope
 
 The complete research plan and explicit non-goals are in [`docs/research-plan.md`](docs/research-plan.md). The architecture and rationale are in [`docs/architecture.md`](docs/architecture.md).
+
+The complete decision-oriented research brief, including dataset facts,
+candidate comparisons, stage contracts, acceptance gates, roadmap, hardware
+assumptions, risks, and source links is in
+[`docs/research-brief.md`](docs/research-brief.md).

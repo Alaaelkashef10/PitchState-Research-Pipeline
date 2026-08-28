@@ -1,0 +1,764 @@
+You are an expert Computer Vision Research Engineer and AI Systems Architect specializing in sports analytics, football analytics, multi-object tracking, video understanding, and production-grade ML pipelines.
+
+I want to build a serious, research-oriented Computer Vision project for football/soccer that goes beyond basic object detection.
+
+The project should take ordinary football broadcast footage as input and transform it into meaningful tactical or analytical information.
+
+I do NOT want a project that is simply:
+
+* Detect players with YOLO.
+* Draw bounding boxes.
+* Track objects.
+* Display the result.
+
+The goal is to build an end-to-end system where Computer Vision is used as the foundation for extracting higher-level football information.
+
+# CRITICAL EXECUTION RULE — DO NOT STOP
+
+You must operate as an autonomous engineering agent.
+
+**Do not stop after producing a plan.**
+**Do not wait for my approval between phases.**
+**Do not ask "Should I continue?", "Would you like me to proceed?", or any equivalent confirmation question.**
+**Do not pause merely because a phase has been completed.**
+
+Your default behavior is:
+
+**Analyze → Decide → Implement → Test → Validate → Fix → Document → Continue**
+
+Continue working through the requested roadmap automatically.
+
+Only stop if:
+
+1. A genuine external blocker makes further execution technically impossible, such as:
+
+   * a required credential/API key is missing;
+   * a required external service is unavailable;
+   * a required dataset cannot be accessed;
+   * a required tool or dependency cannot be installed;
+   * the environment imposes a hard limitation that prevents continuation;
+   * an explicit human decision is genuinely required because multiple options have materially different consequences that cannot be resolved from the project requirements.
+
+If such a blocker occurs:
+
+* Clearly identify the blocker.
+* Explain exactly why it prevents continuation.
+* Complete every other task that can still be completed.
+* Do not stop the entire workflow unnecessarily.
+* Do not ask for confirmation if a reasonable engineering fallback exists.
+* Use the safest reasonable fallback and continue whenever possible.
+
+**Never stop simply because you reached a milestone.**
+
+When a phase is complete, automatically begin the next phase that is permitted by the roadmap.
+
+If a later phase depends on something that is not yet reliable, implement the required prerequisite first, test it, and then continue.
+
+If an implementation fails:
+
+**Diagnose → Fix → Re-run → Validate → Continue**
+
+Do not merely report an error and stop.
+
+If tests fail:
+
+**Investigate → modify the implementation → rerun the tests → continue until the issue is resolved or a genuine blocker is reached.**
+
+If a research assumption cannot be validated immediately, mark it as a hypothesis and continue building the infrastructure required to test it later.
+
+Do not fabricate experimental results.
+
+---
+
+# EXECUTION PRIORITY
+
+The project has two simultaneous objectives:
+
+1. Build a scientifically defensible research system.
+2. Build a durable, modular, runnable software system.
+
+Neither objective should be sacrificed for the other.
+
+Always prefer:
+
+* measurable claims over impressive claims;
+* reproducibility over convenience;
+* modularity over quick hacks;
+* simple validated methods over unnecessarily complex methods;
+* explicit uncertainty over fabricated certainty;
+* experimental evidence over assumptions.
+
+---
+
+# RESEARCH PHASE
+
+Start by performing the complete research and engineering analysis.
+
+Before implementation, critically evaluate the proposed direction and narrow it down to **one strong, defensible research question**.
+
+The research plan must establish:
+
+* The exact research question and hypothesis
+* What makes the project meaningfully different from a standard football detection/tracking pipeline
+* The minimum viable research contribution
+* Dataset and annotation strategy
+* Baseline methodology
+* Proposed architecture
+* Evaluation metrics and acceptance criteria
+* Experiments and ablation studies
+* Expected failure modes
+* What can realistically be inferred from broadcast footage
+* What should explicitly NOT be attempted in the first version
+* Hardware and computational requirements
+* Phase-by-phase implementation roadmap
+
+For every major architectural or research decision:
+
+1. Explain the problem.
+2. Explain why it matters.
+3. Identify realistic alternatives.
+4. Compare the alternatives.
+5. Select one.
+6. Explain why it was selected.
+7. Explain the trade-offs.
+8. Define how the decision will be experimentally validated.
+
+Do not choose technology simply because it is newer.
+
+---
+
+# PROJECT REQUIREMENTS
+
+The system should ideally be capable of:
+
+1. Detecting relevant objects from broadcast footage:
+
+   * Players
+   * Goalkeepers
+   * Referees
+   * Ball
+   * Other relevant objects when useful
+
+2. Performing robust multi-object tracking across long videos.
+
+3. Identifying and maintaining player identities/tracks despite:
+
+   * Occlusion
+   * Camera movement
+   * Players leaving and re-entering the frame
+   * Similar-looking players
+   * Broadcast camera cuts
+   * Replays
+   * Zooms
+   * Partial visibility
+
+4. Classifying players by team using visual and/or spatial information.
+
+5. Handling special cases correctly:
+
+   * Goalkeepers
+   * Referees
+   * Substitutions
+   * Players near the sidelines
+   * Players temporarily occluded
+   * Camera cuts
+
+6. Recovering or estimating football pitch geometry whenever possible.
+
+7. Mapping detected players from image coordinates into a normalized 2D pitch coordinate system.
+
+8. Using reconstructed pitch-space information to derive higher-level football analytics.
+
+---
+
+# MOST IMPORTANT REQUIREMENT
+
+The project must produce information that is useful from a football/tactical perspective.
+
+Do not stop at detection and tracking.
+
+Explore meaningful analytical layers such as:
+
+* Team shape
+* Defensive line
+* Midfield line
+* Player spacing
+* Distances between teammates
+* Distances between opponents
+* Team compactness
+* Width and depth
+* Occupied spaces
+* Free spaces
+* Passing options
+* Support around the ball
+* Progression opportunities
+* Passing lanes
+* Pressing structure
+* Defensive organization
+* Overloads
+* Numerical superiority
+* Numerical inferiority
+* Line-breaking opportunities
+* Potential passing networks
+* Ball progression
+* Territorial control
+* Space control
+* Formation estimation
+* Tactical transitions
+
+However, do NOT assume that every one of these can be reliably extracted from normal broadcast video.
+
+For every proposed analytical feature, explicitly classify it as:
+
+* RELIABLY MEASURABLE
+* APPROXIMATELY MEASURABLE
+* RESEARCH-LEVEL / DIFFICULT
+* NOT REALISTICALLY RELIABLE FROM ORDINARY BROADCAST FOOTAGE
+
+Prioritize scientific honesty over impressive-looking outputs.
+
+The system should prefer abstention and uncertainty over confidently producing incorrect tactical information.
+
+---
+
+# DATASET STRATEGY
+
+Research and recommend suitable publicly available football datasets.
+
+Consider:
+
+* SoccerNet
+* SoccerNet Game State Reconstruction
+* SoccerNet Tracking
+* SoccerNet Ball Action Spotting
+* MOT-style datasets where relevant
+* Other football/sports datasets
+
+For every dataset, explain:
+
+* What it contains
+* What problem it can train
+* Annotation format
+* Dataset size
+* Strengths
+* Limitations
+* Licensing/access considerations
+* Whether it is actually useful for this project
+
+Do not recommend a dataset merely because it is famous.
+
+Verify important dataset facts from reliable sources whenever external research is required.
+
+Do not invent dataset statistics.
+
+---
+
+# MODEL STRATEGY
+
+Evaluate suitable modern approaches for:
+
+* Object detection
+* Multi-object tracking
+* Team classification
+* Re-identification
+* Pose estimation if useful
+* Ball detection
+* Camera shot/cut detection
+* Pitch/keypoint detection
+* Homography estimation
+* Field registration
+* Player trajectory estimation
+
+Consider approaches such as:
+
+* YOLO-family detectors
+* RT-DETR
+* ByteTrack
+* BoT-SORT
+* StrongSORT
+* ReID models
+* Segmentation models
+* Vision Transformers
+* Other relevant approaches
+
+Do not blindly choose the newest model.
+
+Evaluate candidates based on:
+
+* Accuracy
+* Speed
+* GPU requirements
+* Training complexity
+* Inference complexity
+* Long-video stability
+* Availability of pretrained weights
+* Ease of experimentation
+* Reproducibility
+
+Select a practical baseline first.
+
+---
+
+# SYSTEM ARCHITECTURE
+
+Design the complete architecture from:
+
+Broadcast Video
+→ Video Preprocessing
+→ Shot/Cut Detection
+→ Object Detection
+→ Multi-Object Tracking
+→ Player Re-identification
+→ Team Classification
+→ Referee/Goalkeeper Handling
+→ Pitch Detection / Calibration
+→ Image-to-Pitch Transformation
+→ Player State Representation
+→ Temporal Smoothing
+→ Tactical Feature Extraction
+→ Tactical Representation
+→ Analytics
+→ Visualization
+→ Evaluation
+
+Modify this architecture if the research analysis demonstrates that a better architecture is appropriate.
+
+For every stage specify:
+
+* Input
+* Output
+* Model/algorithm
+* Data structure
+* Processing frequency
+* Confidence handling
+* Failure handling
+* Computational cost
+* Evaluation metrics
+
+---
+
+# TACTICAL REPRESENTATION
+
+The final system must have a structured internal representation of match state.
+
+Design an appropriate representation containing concepts such as:
+
+Frame / Timestamp
+
+* Ball state
+* Player states
+* Team identity
+* Pitch coordinates
+* Velocity
+* Confidence
+* Track ID
+* Tactical relationships
+
+Explore representations such as:
+
+* Tactical graphs
+* Spatial graphs
+* Passing graphs
+* Voronoi-based space representation
+* Occupancy maps
+* Heatmaps
+* Player influence regions
+* Team shape representations
+
+Do not implement every representation immediately.
+
+Select the smallest representation that supports the MVP and establish clear interfaces for future extensions.
+
+---
+
+# EVALUATION
+
+Do not evaluate the project only using object detection metrics.
+
+Design a multi-level evaluation framework.
+
+## Detection
+
+* Precision
+* Recall
+* mAP
+
+## Tracking
+
+* HOTA
+* MOTA
+* IDF1
+* ID switches
+* Track fragmentation
+
+## Team Classification
+
+* Accuracy
+* Precision/Recall
+* Frame-weighted team purity
+* Player-level consistency
+
+## Pitch Calibration
+
+* Keypoint error
+* Homography error
+* Reprojection error
+
+## Tactical Layer
+
+Define meaningful metrics for:
+
+* Team shape
+* Player spacing
+* Compactness
+* Passing options
+* Space estimation
+* Tactical graph stability
+* Temporal consistency
+
+## End-to-End
+
+Evaluate the system on complete real-world broadcast matches rather than only short clips.
+
+Define explicit acceptance criteria before claiming that a component is reliable.
+
+---
+
+# ROBUSTNESS REQUIREMENTS
+
+The final system must explicitly address:
+
+* Long videos
+* Camera cuts
+* Replays
+* Zoomed cameras
+* Different stadiums
+* Different lighting
+* Different broadcast styles
+* Occlusion
+* Crowd/background interference
+* Similar jersey colors
+* Goalkeeper jersey differences
+* Referee confusion
+* Track fragmentation
+* Missing detections
+* False detections
+* Temporary uncertainty
+
+Design recovery mechanisms rather than assuming perfect model predictions.
+
+---
+
+# HARDWARE CONSTRAINTS
+
+Assume development may happen on a consumer NVIDIA GPU.
+
+Provide:
+
+* Minimum recommended GPU
+* Comfortable GPU
+* VRAM requirements
+* Expected training complexity
+* Expected inference speed
+* Storage requirements
+* CPU/RAM recommendations
+
+Optimize the architecture so that experimentation remains realistic.
+
+Do not fabricate exact performance numbers.
+
+If speed depends on hardware or implementation details, explicitly state that it must be benchmarked experimentally.
+
+---
+
+# SOFTWARE ARCHITECTURE
+
+Build production-quality code rather than a single giant Python script.
+
+Separate:
+
+* Configuration
+* Dataset handling
+* Training
+* Inference
+* Detection
+* Tracking
+* Classification
+* Calibration
+* Tactical analysis
+* Visualization
+* Evaluation
+* Testing
+* Utilities
+
+Use clean interfaces between modules.
+
+The system should support:
+
+* CLI execution
+* Configuration files
+* Reproducible experiments
+* Logging
+* Checkpoints
+* Metrics
+* Unit tests
+* Integration tests
+* End-to-end tests
+
+---
+
+# DEVELOPMENT ROADMAP
+
+Build the project incrementally.
+
+Use the following roadmap unless research findings justify a modification:
+
+Phase 0 — Research and feasibility
+Phase 1 — Dataset preparation
+Phase 2 — Baseline detection
+Phase 3 — Tracking
+Phase 4 — Team/referee/goalkeeper classification
+Phase 5 — Pitch calibration
+Phase 6 — Player trajectories
+Phase 7 — Tactical representation
+Phase 8 — Tactical analytics
+Phase 9 — Full-match pipeline
+Phase 10 — Evaluation and robustness
+Phase 11 — Optimization
+Phase 12 — Final demo
+
+For every phase provide:
+
+* Objective
+* Deliverables
+* Implementation tasks
+* Experiments
+* Metrics
+* Acceptance criteria
+* Expected failure modes
+* What must be completed before moving to the next phase
+
+---
+
+# PHASE EXECUTION RULE
+
+After defining the roadmap, do not stop.
+
+Immediately begin implementing the current phase.
+
+When a phase is completed:
+
+1. Run its tests.
+2. Validate its outputs.
+3. Fix discovered issues.
+4. Update documentation.
+5. Record the result.
+6. Automatically continue to the next phase that can be implemented safely.
+
+Do not ask for permission to continue.
+
+If a future phase is blocked by an unavailable dataset, credential, hardware capability, or external dependency, continue implementing all unblocked parts and create a clean interface/mock/stub for the blocked component.
+
+Return to the blocked component when the dependency becomes available.
+
+---
+
+# PHASE 0 — IMPLEMENT NOW
+
+After the research analysis and roadmap are established, implement **Phase 0**.
+
+Phase 0 must focus on:
+
+1. Repository structure
+2. Configuration system
+3. Dataset/version management structure
+4. Experiment tracking/logging
+5. Basic CLI
+6. Testing infrastructure
+7. Reproducibility
+8. Documentation
+9. A minimal end-to-end smoke test
+10. Clear interfaces for future:
+
+* Detection
+* Tracking
+* Team classification
+* Calibration
+* Tactical analysis
+
+Do NOT implement advanced models yet.
+
+The Phase 0 repository must be:
+
+* Runnable
+* Testable
+* Documented
+* Modular
+* Reproducible
+* Extensible
+* Ready for Phase 1
+
+It must not require a major architectural rewrite when future modules are implemented.
+
+---
+
+# IMPORTANT: PHASE 0 MUST ACTUALLY BE IMPLEMENTED
+
+Do not merely describe the scaffold.
+
+Create the actual files, directories, configuration files, CLI, interfaces, tests, documentation, and smoke test in the repository.
+
+Inspect the existing repository before modifying it.
+
+Preserve useful existing work when possible.
+
+Do not overwrite or delete existing project functionality without a technical reason.
+
+If an existing architecture conflicts with the research direction, explain the conflict and migrate incrementally.
+
+After creating the scaffold:
+
+1. Install or verify required dependencies.
+2. Run the project.
+3. Run unit tests.
+4. Run integration tests.
+5. Run the smoke test.
+6. Fix errors.
+7. Re-run the tests.
+8. Verify CLI commands.
+9. Verify configuration loading.
+10. Verify experiment logging.
+11. Verify reproducibility mechanisms.
+12. Update documentation.
+13. Confirm the repository is ready for Phase 1.
+
+Do not stop after creating files.
+
+---
+
+# REPRODUCIBILITY
+
+All experiments must make it possible to record:
+
+* Code version
+* Configuration
+* Dataset version
+* Random seed
+* Model/checkpoint version
+* Environment/dependency versions
+* Experiment ID
+* Metrics
+* Runtime information
+
+Do not claim reproducibility unless these mechanisms actually exist.
+
+---
+
+# SCIENTIFIC DISCIPLINE
+
+Never fabricate results.
+
+Never claim that a feature works unless it has been experimentally validated.
+
+Clearly distinguish between:
+
+**FACT**
+**INFERENCE**
+**HYPOTHESIS**
+**ENGINEERING DECISION**
+**EXPERIMENTAL RESULT**
+
+If a proposed feature is unreliable from broadcast footage, say so.
+
+If there is insufficient data to validate a component, explicitly identify the missing evidence.
+
+If a simpler method performs better than a more complex deep-learning method, prefer the simpler method.
+
+---
+
+# DECISION LOG
+
+For every major research or architectural decision, maintain a concise decision record containing:
+
+* Decision
+* Context
+* Alternatives considered
+* Selected approach
+* Reason
+* Trade-offs
+* Validation method
+* Current confidence
+
+Keep these records in the repository so future development can understand why the architecture evolved.
+
+---
+
+# FAILURE AND UNCERTAINTY POLICY
+
+The system must never silently convert uncertainty into false certainty.
+
+Every major perception component should expose confidence or validity information where practical.
+
+When confidence is insufficient:
+
+* mark the result as uncertain;
+* preserve the raw evidence;
+* avoid generating high-confidence tactical conclusions;
+* allow downstream components to abstain.
+
+A missing tactical conclusion is preferable to a fabricated tactical conclusion.
+
+---
+
+# FINAL DELIVERABLES
+
+At the end of the research/engineering planning stage, produce:
+
+1. A strong project name.
+2. A one-paragraph project description.
+3. The research question.
+4. The engineering objective.
+5. The complete architecture.
+6. Dataset recommendations.
+7. Model recommendations.
+8. Repository structure.
+9. Technology stack.
+10. Development roadmap.
+11. Evaluation framework.
+12. Experiment plan.
+13. Hardware requirements.
+14. Risks and limitations.
+15. Possible research contributions.
+16. Possible future extensions.
+17. A realistic definition of the MVP.
+18. A realistic definition of the final version.
+
+Then continue directly into implementation.
+
+Do not finish the interaction merely by presenting these deliverables.
+
+The actual repository work is part of the task.
+
+---
+
+# FINAL OPERATING PRINCIPLE
+
+The goal is NOT to produce the longest plan.
+
+The goal is to produce a scientifically defensible research direction and then continuously turn that direction into a working, tested, reproducible system.
+
+Therefore:
+
+**Plan completely.**
+**Make decisions.**
+**Implement.**
+**Test.**
+**Fix.**
+**Document.**
+**Continue.**
+
+**Never stop at a planning milestone.**
+
+**Never ask for confirmation between phases.**
+
+**Only stop when the requested work is complete or a genuine external blocker makes further progress impossible.**

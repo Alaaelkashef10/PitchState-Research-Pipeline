@@ -42,6 +42,7 @@ class Detection:
     category: Role
     bounding_box: BoundingBox
     confidence: float
+    provenance: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -55,6 +56,7 @@ class TrackObservation:
     team_confidence: float = 0.0
     role_confidence: float = 0.0
     pitch_point: Point2D | None = None
+    provenance: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -75,6 +77,7 @@ class CalibrationState:
     scale_y: float = 1.0
     offset_x: float = 0.0
     offset_y: float = 0.0
+    provenance: tuple[str, ...] = ()
 
     def project(self, point: Point2D, frame_width: int, frame_height: int) -> Point2D:
         """Project a pixel point into normalized pitch coordinates."""
@@ -106,6 +109,7 @@ class MatchState:
     calibration: CalibrationState
     players: tuple[TrackObservation, ...]
     valid: bool
+    shot_boundary: bool = False
     abstention_reasons: tuple[str, ...] = ()
     team_shape: tuple[ShapeMetrics, ...] = ()
 
@@ -115,6 +119,7 @@ class PipelineResult:
     schema_version: str
     run_id: str
     states: tuple[MatchState, ...]
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

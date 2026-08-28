@@ -1,0 +1,1 @@
+"""Shot and replay boundary detection contracts."""

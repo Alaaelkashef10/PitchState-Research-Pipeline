@@ -1,0 +1,192 @@
+Before starting Phase 1, I want a critical review of the current research plan.
+
+Do NOT modify the code yet.
+
+I want you to act as a skeptical research reviewer rather than as the project implementer.
+
+Review the current PitchState research question, hypothesis, proposed contribution, baselines B0/B1/P1, evaluation metrics, and dataset strategy.
+
+Specifically investigate:
+
+1. NOVELTY
+   Determine whether the proposed contribution is actually novel.
+
+Search the relevant academic literature and existing football-analysis systems for work involving:
+
+* broadcast football pitch calibration
+* SoccerNet Game State Reconstruction
+* temporal homography estimation
+* player tracking and tracklet association
+* team shape reconstruction
+* confidence-aware / selective prediction
+* uncertainty-aware sports analytics
+* pitch-space player positioning
+* tactical shape estimation from broadcast video
+
+Identify papers, benchmarks, open-source implementations, or existing systems that are substantially similar.
+
+Do not claim novelty merely because our implementation combines existing components.
+
+Clearly distinguish:
+
+* genuinely novel contribution
+* engineering contribution
+* reproduction/integration
+* potentially novel combination that requires experimental validation
+
+2. RESEARCH QUESTION
+
+Critically evaluate whether the current research question is:
+
+* sufficiently novel
+* experimentally testable
+* narrow enough
+* technically feasible
+* meaningful to football analytics
+* publishable as a research-engineering project
+
+If it is weak, propose a better research question.
+
+Do not change it simply to make it sound more impressive.
+
+3. HYPOTHESIS
+
+Check whether the current hypothesis actually follows from the proposed methods.
+
+Identify hidden assumptions.
+
+For example:
+
+* Does temporal calibration necessarily improve pitch-space shape accuracy?
+* Can appearance-assisted tracklet association meaningfully improve shape metrics?
+* Does abstention improve reliability without simply hiding failures?
+* How should selective performance be compared fairly against a system that always outputs a prediction?
+
+If necessary, rewrite the hypothesis into a falsifiable form.
+
+4. EVALUATION VALIDITY
+
+This is extremely important.
+
+Audit every proposed metric.
+
+For each metric explain:
+
+* What it measures
+* Why it is appropriate
+* What ground truth is required
+* Whether the available datasets actually provide that ground truth
+* Potential confounders
+* Whether optimizing it could produce misleading conclusions
+
+Pay particular attention to:
+
+* team centroid
+* width
+* depth
+* pairwise spacing
+* compactness
+* temporal jitter
+* frame-weighted team purity
+* risk-coverage
+* abstention rate
+
+Determine whether these metrics are mathematically well-defined and robust to missing players.
+
+5. AVOIDING THE "ABSTENTION TRICK"
+
+Design a rigorous evaluation protocol that prevents the system from appearing better simply by abstaining on difficult frames.
+
+Compare systems at:
+
+* equal coverage
+* equal confidence thresholds where appropriate
+* full coverage
+* predefined coverage levels
+
+Define what constitutes useful abstention versus excessive abstention.
+
+The proposed system must not be allowed to improve its score simply by reporting fewer frames.
+
+6. DATASET AUDIT
+
+Verify the actual contents, annotations, splits, and evaluation protocols of the proposed datasets.
+
+Especially verify:
+
+* SoccerNet-GSR
+* SoccerNet Tracking
+* SoccerNet Camera Calibration
+
+Do not rely on memory or assumptions.
+
+For every dataset state exactly what can and cannot be evaluated.
+
+Also identify whether we need a custom annotated evaluation subset.
+
+7. BASELINE FAIRNESS
+
+Audit B0, B1, and P1.
+
+Make sure the comparison isolates the actual research contribution.
+
+For example, if P1 uses a better detector, better tracker, and better calibration simultaneously, we cannot attribute improvements to temporal calibration or confidence handling.
+
+Design controlled ablations such as:
+
+B1
+B1 + temporal calibration
+B1 + improved association
+B1 + confidence gating
+B1 + temporal calibration + association
+B1 + all components
+
+8. FAILURE ANALYSIS
+
+Define a formal failure taxonomy:
+
+* detector failure
+* identity failure
+* team-classification failure
+* calibration failure
+* camera-cut failure
+* replay failure
+* occlusion
+* missing players
+* false players
+* footpoint error
+* homography error
+* temporal drift
+
+Explain how each failure should be detected and how it propagates into the final tactical metrics.
+
+9. RESEARCH CONTRIBUTION
+
+At the end, give me three possible contribution levels:
+
+A. Conservative
+A strong engineering/reproducibility contribution.
+
+B. Research-oriented
+A measurable methodological contribution.
+
+C. Strongest defensible version
+The most ambitious contribution that can still be scientifically defended using the available data.
+
+For each one, explain exactly what evidence would be required to support the claim.
+
+10. FINAL DECISION
+
+Conclude with one of:
+
+KEEP
+MODIFY
+RETHINK
+
+If the answer is MODIFY or RETHINK, provide the revised research question and explain why.
+
+Do not write implementation code.
+
+Do not start Phase 1.
+
+The objective of this review is to make sure we are not building a technically impressive system around a weak or already-solved research question.

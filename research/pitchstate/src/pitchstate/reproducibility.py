@@ -7,6 +7,8 @@ import json
 import os
 import platform
 import random
+import subprocess
+import sys
 from typing import Any
 
 
@@ -37,4 +39,22 @@ def environment_metadata() -> dict[str, str]:
     return {
         "python": platform.python_version(),
         "platform": platform.platform(),
+        "python_implementation": platform.python_implementation(),
+        "executable": sys.executable,
     }
+
+
+def code_revision() -> str:
+    """Return the repository revision when available, never inventing one."""
+
+    try:
+        completed = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return "unknown"
+    revision = completed.stdout.strip()
+    return revision or "unknown"

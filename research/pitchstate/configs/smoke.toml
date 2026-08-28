@@ -13,6 +13,8 @@ min_players_per_team = 2
 minimum_calibration_confidence = 0.75
 maximum_reprojection_error = 0.05
 minimum_player_confidence = 0.50
+minimum_team_confidence = 0.75
+minimum_role_confidence = 0.75
 
 [logging]
 run_directory = "experiments/runs"

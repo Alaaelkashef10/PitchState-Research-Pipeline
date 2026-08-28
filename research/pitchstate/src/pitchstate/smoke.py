@@ -9,7 +9,7 @@ from pitchstate.classification.interface import TeamRoleClassifier
 from pitchstate.config import ProjectConfig
 from pitchstate.detection.interface import Detector
 from pitchstate.pipeline import run_pipeline
-from pitchstate.reproducibility import make_run_id, seed_everything
+from pitchstate.reproducibility import code_revision, environment_metadata, make_run_id, seed_everything
 from pitchstate.schema import (
     BoundingBox,
     CalibrationState,
@@ -126,4 +126,15 @@ def run_smoke(config: ProjectConfig):
         analyzer=SyntheticShapeAnalyzer(),
         config=config,
         run_id=run_id,
+        metadata={
+            "project_name": config.project_name,
+            "experiment_name": config.experiment_name,
+            "seed": config.seed,
+            "config": config.to_dict(),
+            "dataset_id": "synthetic-phase0",
+            "dataset_version": "synthetic-v1",
+            "model_version": "synthetic-components",
+            "code_revision": code_revision(),
+            "environment": environment_metadata(),
+        },
     )
