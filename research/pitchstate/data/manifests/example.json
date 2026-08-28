@@ -1,33 +1,93 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "dataset_id": "soccernet-gsr",
-  "dataset_version": "access-pending",
+  "dataset_version": "gamestate-2024",
   "source_url": "https://www.soccer-net.org/tasks/game-state-reconstruction",
-  "license_or_access": "Public benchmark with access conditions to verify before download",
-  "status": "not_downloaded",
+  "license_or_access": "Video access requires the SoccerNet NDA; research-only use is documented in the official FAQ; local authorization is pending",
+  "status": "source_verified_access_pending",
   "local_root": "data/raw/soccernet-gsr",
+  "source_checked_on": "2026-08-28",
+  "release_or_download_date": null,
+  "clip_structure": {
+    "description": "Main-camera broadcast video clips",
+    "duration_seconds": 30,
+    "frame_rate_fps": null,
+    "resolution": "1080p"
+  },
+  "annotations": {
+    "player_boxes": {
+      "status": "source_verified_access_pending",
+      "fields": ["player localization"],
+      "notes": "The official task page describes localization of sports individuals."
+    },
+    "role_labels": {
+      "status": "source_verified_access_pending",
+      "fields": ["player", "goalkeeper", "referee", "other"],
+      "notes": "Verify exact serialized values after an authorized release is downloaded."
+    },
+    "team_labels": {
+      "status": "source_verified_access_pending",
+      "fields": ["team left", "team right"],
+      "notes": "Ambiguous values map to unknown during normalization."
+    },
+    "identity_labels": {
+      "status": "source_verified_access_pending",
+      "fields": ["jersey number"],
+      "notes": "Jersey identity is documented by the task but is not a v1 dependency."
+    },
+    "tracking_ids": {
+      "status": "source_verified_access_pending",
+      "fields": ["track identity"],
+      "notes": "Confirm exact identity and frame serialization locally."
+    },
+    "pitch_coordinates": {
+      "status": "source_verified_access_pending",
+      "fields": ["field/court coordinates"],
+      "notes": "Required for the primary shape ground-truth feasibility gate."
+    },
+    "calibration_annotations": {
+      "status": "not_in_gsr_task",
+      "fields": [],
+      "notes": "Use the separate SoccerNet Camera Calibration task."
+    },
+    "shot_boundaries": {
+      "status": "not_verified_in_gsr_release",
+      "fields": [],
+      "notes": "Do not infer shot labels from task relationship alone."
+    },
+    "replay_information": {
+      "status": "not_verified_in_gsr_release",
+      "fields": [],
+      "notes": "Use a separately audited replay/shot source for stress testing."
+    }
+  },
+  "split_strategy": "match_level_disjoint; validation selects thresholds; test remains frozen",
   "splits": [
     {
       "name": "train",
       "partition": "official",
       "games": [],
+      "clips": [],
       "notes": "Populate after access and split audit."
     },
     {
       "name": "validation",
       "partition": "official",
       "games": [],
+      "clips": [],
       "notes": "Populate after access and split audit."
     },
     {
       "name": "test",
       "partition": "official",
       "games": [],
+      "clips": [],
       "notes": "Populate after access and split audit."
     }
   ],
   "notes": [
-    "This fixture intentionally contains no fabricated clip counts or local file hashes.",
-    "The official task page documents the benchmark scope and metric."
+    "This manifest records official source metadata only; no local videos or annotations have been downloaded.",
+    "The official page describes 57 train, 59 validation, and 50 test clips, but local split membership remains empty until access and release audit.",
+    "The shape ground-truth gate is blocked until pitch-coordinate records are inspected in the authorized release."
   ]
 }

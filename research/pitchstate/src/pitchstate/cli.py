@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Sequence
 
 from pitchstate.config import load_config
-from pitchstate.datasets.manifest import load_manifest
+from pitchstate.datasets.manifest import audit_split_integrity, load_manifest
 from pitchstate.logging_utils import ExperimentLogger
 from pitchstate.reproducibility import code_revision, environment_metadata
 from pitchstate.smoke import run_smoke
@@ -29,6 +29,10 @@ def _build_parser() -> argparse.ArgumentParser:
     manifest_subparsers = manifest.add_subparsers(dest="manifest_command", required=True)
     validate = manifest_subparsers.add_parser("validate", help="Validate one JSON manifest.")
     validate.add_argument("--path", type=Path, required=True)
+    audit = manifest_subparsers.add_parser(
+        "audit", help="Validate a manifest and print split-integrity counts."
+    )
+    audit.add_argument("--path", type=Path, required=True)
     return parser
 
 
@@ -79,12 +83,21 @@ def _validate_manifest(path: Path) -> int:
     return 0
 
 
+def _audit_manifest(path: Path) -> int:
+    manifest = load_manifest(path)
+    audit = audit_split_integrity(manifest)
+    print(json.dumps({"dataset_id": manifest.dataset_id, **audit}, sort_keys=True))
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     if args.command == "smoke":
         return _run_smoke(args.config, args.output)
     if args.command == "manifest" and args.manifest_command == "validate":
         return _validate_manifest(args.path)
+    if args.command == "manifest" and args.manifest_command == "audit":
+        return _audit_manifest(args.path)
     raise RuntimeError("Unsupported command")
 
 

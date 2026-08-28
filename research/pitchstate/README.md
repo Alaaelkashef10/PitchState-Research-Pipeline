@@ -82,3 +82,6 @@ The complete decision-oriented research brief, including dataset facts,
 candidate comparisons, stage contracts, acceptance gates, roadmap, hardware
 assumptions, risks, and source links is in
 [`docs/research-brief.md`](docs/research-brief.md).
+
+The Phase 1 source audit and explicit shape-ground-truth feasibility gate are
+documented in [`docs/dataset-audit.md`](docs/dataset-audit.md).

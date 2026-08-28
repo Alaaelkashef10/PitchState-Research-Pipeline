@@ -1,0 +1,68 @@
+Start with **Prepare a leakage-safe football dataset for experiments**.
+
+Do this as the next concrete research gate, not as a generic data-preparation task.
+
+Before implementing anything, inspect the current research brief and repository contracts, then produce a concise execution plan and proceed continuously without stopping for approval unless a genuinely blocking ambiguity requires it.
+
+The goal is to create a reproducible, leakage-safe experimental dataset foundation for PitchState.
+
+Requirements:
+
+1. Audit the exact SoccerNet release/task data available for:
+
+   * Game State Reconstruction
+   * Tracking
+   * Camera Calibration
+   * any shot/replay metadata that is actually usable
+2. Do not assume that an annotation exists because the task is related to it. Verify what is actually available.
+3. Explicitly document:
+
+   * exact release/version or download date
+   * matches/games
+   * clip structure
+   * frame rate/resolution if available
+   * player/role/team annotations
+   * tracking IDs
+   * pitch/reference coordinates
+   * calibration annotations
+   * shot/replay information
+   * missing/ambiguous labels
+   * license/access constraints
+4. Build a match-level split strategy:
+
+   * train/validation/test identities must be disjoint by match/game
+   * never split neighboring clips from the same match across different splits
+   * never use test information for threshold selection
+5. Implement a dataset manifest that records the exact dataset release, split membership, annotation availability, provenance, and validation status.
+6. Add an automated leakage audit that fails loudly if the same match/game can appear across incompatible splits.
+7. Add annotation/schema validation and report missing or inconsistent records rather than silently repairing them.
+8. Preserve `unknown` for ambiguous team/role/identity labels.
+9. Do not put credentials, signed URLs, private links, downloaded videos, or model weights into manifests.
+10. Keep raw reference annotations separate from derived team-shape metrics.
+11. Add deterministic tests for:
+
+* split integrity
+* duplicate match detection
+* leakage detection
+* manifest validation
+* annotation mapping
+
+12. If the required ground truth for the planned primary shape metrics cannot be derived reliably from the verified dataset annotations, STOP the research progression at a clearly documented feasibility gate and explain exactly what is missing. Do not invent a proxy and present it as ground truth.
+
+Important research constraint:
+
+Do not modify the research question merely to fit the dataset. If the dataset cannot support the current primary research question, document the mismatch explicitly and propose the minimum defensible adjustment.
+
+Do not start detector training, tracking experiments, tactical analytics, or model optimization yet. This task is only about establishing a trustworthy experimental data foundation.
+
+At the end, provide:
+
+* files changed/created
+* dataset audit results
+* split definition
+* leakage-audit result
+* annotation coverage
+* known limitations/blockers
+* exact next recommended experiment
+
+Then continue to the next non-blocked implementation step automatically.
