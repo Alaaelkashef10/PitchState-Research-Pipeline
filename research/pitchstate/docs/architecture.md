@@ -87,3 +87,66 @@ the MVP.
 
 **Reason:** the research goal is trustworthy measurement. Silent imputation would
 make visually persuasive but scientifically unsupported outputs.
+
+### Manifest ``validation_status`` as a field distinct from ``status`` (2026-08-29)
+
+**Decision:** bump the manifest schema to v0.3 and add a required
+``validation_status`` field with a closed vocabulary (`not_locally_verified`,
+`locally_verified`, `source_verified_access_pending`, `source_verified`,
+`invalid`), enforced at load time in `datasets.manifest.load_manifest`.
+
+**Alternatives:** overload the existing `status` field to also carry local
+verification state, or leave local verification undeclared and rely on the
+prose checklist in `dataset-audit.md` alone.
+
+**Reason:** `status` already means source/access state (e.g.
+`source_verified_access_pending`). Reusing it for "has this manifest's local
+content actually been audited against a downloaded release" would let a
+manifest read as ready the moment access is granted, before the nine-point
+local audit in `dataset-audit.md` has actually run. Making local verification
+its own closed-vocabulary field, enforced by the loader rather than only by
+convention, prevents that gap from being silent. An optional
+`preprocessing_version` field was added alongside it so a manifest can later
+record which local preprocessing pass (if any) produced the files it
+describes; it is not yet consumed by any pipeline stage.
+
+### Runtime split-access guard as a separate layer from manifest leakage audit (2026-08-29)
+
+**Decision:** add `datasets.split_policy.SplitAccessGuard`, a runtime object
+built from a validated manifest that raises `TestSplitAccessError` when code
+asks to use a frozen-split (default: `test`) game or clip identity for
+`threshold_selection` or `hyperparameter_search`.
+
+**Alternatives:** rely on `audit_split_integrity` alone, or document the
+"never touch test for thresholds" rule as an engineering convention without
+runtime enforcement.
+
+**Reason:** `audit_split_integrity` verifies that manifest split membership
+itself is leak-free (no game/clip in two splits). It cannot catch a
+downstream mistake where evaluation or tuning code legitimately loads a
+frozen-split identity and uses it to pick a threshold — the manifest stays
+leak-free while the *experiment* leaks. Since the research question depends on
+a frozen test set (see `research-plan.md`), this class of mistake is high-cost
+and easy to make by accident during iterative experimentation. A guard object
+that call sites must consult turns an easy silent mistake into an immediate,
+loud `TestSplitAccessError`. It does not attempt to statically detect leakage
+in arbitrary code; it only enforces the check where callers actually ask.
+
+### Content-hash duplicate-file detection as a local integrity check, not a leakage check (2026-08-29)
+
+**Decision:** add `datasets.dedup.detect_duplicate_source_files`, which groups
+local files by sha256 content hash (not filename or size) and reports groups
+of more than one file.
+
+**Alternatives:** rely on filename/size heuristics, or defer duplicate
+detection until an authorized SoccerNet release is downloaded.
+
+**Reason:** dataset assembly can produce re-encoded or renamed copies of the
+same source clip; filename/size checks miss re-encodes and can false-positive
+on differently sized but unrelated clips. Content hashing is decoupled from
+naming and container. This is explicitly scoped as a local file-integrity
+check: it does not itself determine whether a duplicate crosses a split
+boundary. A caller that cares about leakage must cross-reference a duplicate
+group's paths against split membership (e.g. via `SplitAccessGuard`) — the two
+checks are kept separate because they answer different questions and a
+duplicate is not automatically a leak.

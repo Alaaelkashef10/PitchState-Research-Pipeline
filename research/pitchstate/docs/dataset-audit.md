@@ -104,13 +104,33 @@ synthetic proxy. Synthetic fixtures validate software contracts only.
 ## Implemented gate infrastructure
 
 - `datasets.manifest` validates provenance, clip structure, annotation status,
-  split policy, and match/clip membership.
+  split policy, and match/clip membership. Schema v0.3 additionally requires a
+  closed-vocabulary `validation_status` field (see architecture.md decision
+  register, 2026-08-29) and accepts an optional `preprocessing_version`.
 - `audit_split_integrity` fails loudly on repeated game or clip IDs.
+- `datasets.split_policy.SplitAccessGuard` enforces at runtime that frozen
+  test-split game/clip identities cannot be used for threshold selection or
+  hyperparameter search, raising `TestSplitAccessError` immediately. This
+  closes the gap left by `audit_split_integrity`, which only checks the
+  manifest's own consistency and cannot see how downstream experiment code
+  uses identities.
+- `datasets.dedup.detect_duplicate_source_files` groups local files by
+  content hash (sha256) rather than filename or size, to catch re-encoded or
+  renamed duplicate clips once files exist locally. It is a local-integrity
+  check, not a leakage check — a duplicate must still be cross-referenced
+  against split membership to determine if it is also a leak.
 - `datasets.annotations` maps known team/role values and preserves unknown
   team, role, and identity labels.
 - `validate_annotation_records` reports missing or inconsistent records without
   repairing them.
 - `make audit-manifest` runs the leakage audit.
+
+The example manifest's `validation_status` is `not_locally_verified`: the
+schema-level infrastructure above is implemented and unit-tested against
+synthetic fixtures, but no authorized SoccerNet-GSR release has been
+downloaded or locally audited. The nine-point feasibility gate in this
+document still governs when `validation_status` may move to
+`locally_verified`.
 
 ## Exact next experiment
 
