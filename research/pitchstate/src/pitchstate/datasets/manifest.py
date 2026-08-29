@@ -16,6 +16,23 @@ class LeakageError(ManifestError):
     """Raised when match or clip identities cross incompatible splits."""
 
 
+#: Closed vocabulary for ``validation_status`` (schema v0.3+). Values are
+#: intentionally distinct from ``status``: ``status`` describes source/access
+#: state, ``validation_status`` describes whether the *local* manifest content
+#: has been verified against a downloaded release. Keeping them separate
+#: avoids a manifest silently reading as "ready" once access is granted but
+#: before the local audit in ``dataset-audit.md`` has actually happened.
+VALID_VALIDATION_STATUSES = frozenset(
+    {
+        "not_locally_verified",
+        "locally_verified",
+        "source_verified_access_pending",
+        "source_verified",
+        "invalid",
+    }
+)
+
+
 @dataclass(frozen=True)
 class DatasetSplit:
     name: str
@@ -54,6 +71,8 @@ class DatasetManifest:
     split_strategy: str
     splits: tuple[DatasetSplit, ...]
     notes: tuple[str, ...]
+    validation_status: str = "not_locally_verified"
+    preprocessing_version: str | None = None
 
 
 def _string(raw: dict[str, Any], key: str) -> str:
@@ -75,6 +94,16 @@ def _string_tuple(raw: dict[str, Any], key: str) -> tuple[str, ...]:
     if not isinstance(values, list) or not all(isinstance(value, str) and value for value in values):
         raise ManifestError(f"{key} must be a list of non-empty strings")
     return tuple(values)
+
+
+def _validate_validation_status(raw: dict[str, Any]) -> str:
+    value = raw.get("validation_status")
+    if value not in VALID_VALIDATION_STATUSES:
+        raise ManifestError(
+            "validation_status must be one of "
+            f"{sorted(VALID_VALIDATION_STATUSES)}, got {value!r}"
+        )
+    return value
 
 
 def _validate_clip_structure(value: Any) -> dict[str, Any]:
@@ -210,6 +239,8 @@ def load_manifest(path: str | Path) -> DatasetManifest:
         split_strategy=_string(raw, "split_strategy"),
         splits=tuple(splits),
         notes=tuple(notes),
+        validation_status=_validate_validation_status(raw),
+        preprocessing_version=_optional_string(raw, "preprocessing_version"),
     )
     audit_split_integrity(manifest)
     return manifest

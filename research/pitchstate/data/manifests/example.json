@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.2",
+  "schema_version": "0.3",
   "dataset_id": "soccernet-gsr",
   "dataset_version": "gamestate-2024",
   "source_url": "https://www.soccer-net.org/tasks/game-state-reconstruction",
@@ -85,6 +85,8 @@
       "notes": "Populate after access and split audit."
     }
   ],
+  "validation_status": "not_locally_verified",
+  "preprocessing_version": null,
   "notes": [
     "This manifest records official source metadata only; no local videos or annotations have been downloaded.",
     "The official page describes 57 train, 59 validation, and 50 test clips, but local split membership remains empty until access and release audit.",
