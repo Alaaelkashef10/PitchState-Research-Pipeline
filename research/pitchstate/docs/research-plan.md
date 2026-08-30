@@ -259,3 +259,32 @@ Planning assumptions, not benchmarks:
 | 10 | Reliability/robustness | Selective-risk report |
 | 11 | Optimization | Documented speed/accuracy trade-off |
 | 12 | Final demo/research package | Every output traceable to data/code |
+
+## Current status against the roadmap (2026-08-29)
+
+- **Phase 0** (repository, config, manifests, logs, interfaces, tests, smoke):
+  satisfied — deterministic smoke run passes.
+- **Phase 1** (dataset acquisition and normalization): partially satisfied.
+  Leakage-safety *infrastructure* is implemented and tested (manifest schema
+  v0.3 with `validation_status`, `datasets.split_policy.SplitAccessGuard`,
+  `datasets.dedup` content-hash duplicate detection — see architecture.md
+  decision register, 2026-08-29). Actual dataset acquisition remains blocked:
+  no authorized SoccerNet release has been downloaded, so no real games or
+  clips populate the manifest's splits yet.
+- **Phases 2–4** (detection, tracking, team/role classification baselines):
+  not started; blocked on the same data-access gate as Phase 1's acquisition
+  step, since a "baseline" is only meaningful against real footage.
+- **Phase 5** (pitch calibration, gate: invalid geometry rejected): the
+  *mathematical foundation* — planar homography estimation via DLT, in
+  `calibration.homography` — is implemented and unit-tested against synthetic
+  correspondences (numerical correctness, degenerate-input rejection,
+  coordinate conventions, abstention on near-infinite projections; see
+  `tests/test_homography.py` and the architecture.md decision register,
+  2026-08-29). This is **not** the same as satisfying Phase 5's gate: that
+  requires the estimator to operate on keypoints actually detected in
+  broadcast footage, which needs a keypoint detector and real video, neither
+  of which exists yet. `calibration.homography` is intentionally not wired
+  into the `Calibrator` protocol or the pipeline until that exists — see
+  `calibration/interface.py` and `calibration/homography.py` module
+  docstrings.
+- **Phases 6–12:** not started; each depends on an earlier blocked phase.

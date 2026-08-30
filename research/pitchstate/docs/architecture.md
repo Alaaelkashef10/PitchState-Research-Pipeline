@@ -150,3 +150,52 @@ boundary. A caller that cares about leakage must cross-reference a duplicate
 group's paths against split membership (e.g. via `SplitAccessGuard`) — the two
 checks are kept separate because they answer different questions and a
 duplicate is not automatically a leak.
+
+### Pure-Python planar homography (DLT) as the Phase 2 calibration foundation, not yet wired to the pipeline (2026-08-29)
+
+**Decision:** add `calibration.homography`, implementing planar homography
+estimation from point correspondences via a Direct-Linear-Transform-style
+linear system, solved with a hand-written Gaussian-elimination solver
+(`solve_linear_system`) — no numpy/scipy dependency. Exactly 4 correspondences
+solve an 8x8 system directly; more than 4 fit via least squares over the
+normal equations. The linearization fixes `h33 = 1`. The module is validated
+only against synthetic, hand-constructed correspondences with a known
+ground-truth transform, and is explicitly **not** wired into the `Calibrator`
+protocol or `schema.CalibrationState` yet.
+
+**Alternatives:** (a) use numpy/scipy for an SVD-based DLT solver; (b) wire a
+homography-based `Calibrator` implementation into the pipeline immediately,
+reusing the existing `CalibrationState` affine fields; (c) defer calibration
+math entirely until real pitch-keypoint data exists.
+
+**Reason for (a):** the Phase 0 decision register already commits this
+repository to a dependency-free Python standard-library foundation so the
+architecture's soundness is not obscured by model/library concerns; a
+numpy/scipy solver would be more numerically robust (true SVD has no `h33 !=
+0` assumption) but was judged not worth breaking that constraint for now. The
+`h33 = 1` normalization and least-squares-via-normal-equations trade-off are
+documented as known limitations in `calibration/homography.py`'s module
+docstring rather than silently accepted.
+
+**Reason for (b):** `CalibrationState` currently models a simple per-axis
+affine projection (`scale_x`, `scale_y`, `offset_x`, `offset_y`), used by the
+Phase 0 synthetic smoke pipeline (`smoke.py`, `test_smoke.py`). A real planar
+homography is a full 3x3 projective transform, not representable in that
+affine schema without either overloading `CalibrationState` (breaking the
+existing, working smoke pipeline and its tests) or introducing a second,
+inconsistent calibration representation into the schema. Wiring a concrete
+`Calibrator` implementation into the pipeline also requires a real source of
+image-to-pitch keypoint correspondences — i.e. a keypoint detector run
+against actual broadcast frames — which does not exist in this repository.
+Building that wiring now would mean shipping pipeline integration that cannot
+be exercised against anything but synthetic stand-ins for a detector that
+doesn't exist, which the project's "no fake progress" principle rules out.
+The estimation math is therefore built and thoroughly tested as a standalone,
+directly testable module first; pipeline integration is deferred to when a
+concrete correspondence source exists.
+
+**Reason for (c) not chosen:** the mathematics of homography estimation
+(numerical stability, degenerate-input handling, coordinate conventions) does
+not depend on real video and is fully testable now with synthetic
+correspondences; deferring it until data access is granted would waste time
+that can be spent validating this component in isolation today.
