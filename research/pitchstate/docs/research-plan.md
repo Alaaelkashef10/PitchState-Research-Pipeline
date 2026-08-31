@@ -301,3 +301,14 @@ register. The ECE-style "calibration error" metric named in that section is
 explicitly deferred; see the same decision register entry for why. This is
 still evaluation-methodology infrastructure, not a real-footage calibration
 accuracy result — no such result exists yet.
+
+### Addendum (2026-08-29, later same day): shape evaluator
+
+`evaluation.shape` now implements the remaining "Shape" metrics from this
+document's "Metrics and acceptance" section (centroid/width/depth/spacing/
+compactness error, temporal jitter, and agreement on shape changes over time)
+against synthetic `ShapeMetrics` fixtures — see `tests/test_shape_evaluation.py`
+and the architecture.md decision register. As with the calibration evaluator,
+this is evaluation-methodology infrastructure only; no real-footage shape
+accuracy result exists yet, since `tactics.shape.calculate_shape_metrics` has
+not been run against anything but synthetic observations.

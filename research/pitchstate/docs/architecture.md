@@ -244,3 +244,41 @@ correctness proxy in a way that doesn't map cleanly onto standard ECE
 binning. Rather than build a metric on top of a signal this repository
 doesn't actually produce, it is left as documented future work in
 `evaluation/calibration.py`'s module docstring.
+
+### Shape evaluator propagates abstention instead of scoring missing fields as zero error (2026-08-29)
+
+**Decision:** add `evaluation.shape`, implementing `shape_error` (per-field
+absolute error between one predicted/reference `ShapeMetrics` pair),
+`shape_error_report` (aggregated mean/max over a frame sequence),
+`temporal_jitter` (mean absolute frame-to-frame change in one field), and
+`shape_change_agreement` (fraction of transitions where predicted and
+reference agree on the direction of change). Every function returns `None`
+for a field/frame wherever either side lacks that field, rather than
+treating a missing value as zero error.
+
+**Alternatives:** (a) treat a `None` field as 0.0 and include it in the mean;
+(b) skip `None` fields silently without reporting how many comparisons were
+actually possible; (c) only implement raw error metrics, without a
+direction-of-change agreement metric.
+
+**Reason for (a) not chosen:** `calculate_shape_metrics` (see
+`tactics/shape.py`) returns an all-`None` `ShapeMetrics` when there are no
+observed pitch points for a team in a frame — that is the system correctly
+reporting "nothing was measurable," per this project's explicit-abstention
+principle. Scoring that as zero error against a non-`None` reference would
+report "perfect agreement" for a case that was actually a total miss; that is
+the opposite of what an evaluator should do.
+
+**Reason for (b) not chosen:** `ShapeErrorFieldSummary.compared_frames`
+records how many frames actually contributed to each field's mean/max,
+so a summary showing "mean width error 0.3" over only 2 of 50 frames reads
+very differently from the same mean over 48 of 50 — the count is reported
+alongside the number specifically so a caller cannot mistake sparse coverage
+for a strong result.
+
+**Reason for (c) not chosen:** research-plan.md's Shape metrics list
+"agreement on shape changes over time" as distinct from an error magnitude
+metric — a system can have real per-frame numeric error while still
+correctly tracking whether a team is widening or narrowing, which is often
+the more decision-relevant signal for a downstream analyst. Implementing only
+raw error would silently drop that half of the specified metric.
