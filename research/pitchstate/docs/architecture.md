@@ -199,3 +199,48 @@ concrete correspondence source exists.
 not depend on real video and is fully testable now with synthetic
 correspondences; deferring it until data access is granted would waste time
 that can be spent validating this component in isolation today.
+
+### Calibration evaluator scored on held-out error, not fit error, with ECE-style calibration error explicitly deferred (2026-08-29)
+
+**Decision:** add `evaluation.calibration`, implementing
+`valid_calibration_coverage`, `abstention_rate_by_reason`,
+`reprojection_error_summary`, and a selective risk/coverage curve
+(`selective_risk_coverage_curve` / `selective_risk_at_coverage`) over
+`CalibrationEvaluationSample` records, each pairing a `HomographyEstimate`
+with an optional held-out reprojection error. The risk/coverage curve ranks
+samples by ascending *in-sample fit* error (the only signal available at
+prediction time) and scores accepted samples by their *held-out* error where
+available. `research-plan.md`'s reliability metric "calibration error" (ECE
+sense) is explicitly not implemented here.
+
+**Alternatives:** (a) summarize `HomographyEstimate.reprojection_error_mean`
+directly, without a held-out/fit-error distinction; (b) rank the risk/coverage
+curve by the same error being evaluated; (c) implement an ECE-style
+calibration-error metric now using `valid` as a stand-in correctness signal.
+
+**Reason for (a) not chosen:** for the minimal 4-correspondence case, fit
+error is ~0 by construction (see `calibration/homography.py`) — treating it
+as an accuracy number would silently report a perfect-looking metric that
+measures curve-fitting, not calibration quality. `reprojection_error_summary`
+therefore prefers a caller-supplied held-out error and counts how often it had
+to fall back to the optimistic in-sample number
+(`fit_error_fallback_count`), so the summary cannot misrepresent its own
+reliability.
+
+**Reason for (b) not chosen:** ranking a risk/coverage curve by the same
+quantity used to compute risk lets the curve "cheat" — it would always look
+monotonically well-behaved by construction, regardless of whether the
+system's own confidence signal is any good. Ranking by fit error (known
+before any ground truth) and scoring by held-out error (known only in
+evaluation) is what makes the curve an honest test of the confidence signal
+itself; `test_ranks_by_fit_confidence_not_true_error` in
+`tests/test_calibration_evaluation.py` demonstrates this directly with a
+deliberately misleading low-fit/high-true-error sample.
+
+**Reason for (c) not chosen:** `HomographyEstimate` exposes a binary `valid`
+flag and a continuous error, not a probability; computing ECE would require
+either inventing a confidence score from nothing or misusing `valid` as a
+correctness proxy in a way that doesn't map cleanly onto standard ECE
+binning. Rather than build a metric on top of a signal this repository
+doesn't actually produce, it is left as documented future work in
+`evaluation/calibration.py`'s module docstring.

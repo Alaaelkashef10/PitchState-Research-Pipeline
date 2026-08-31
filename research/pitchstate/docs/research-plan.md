@@ -288,3 +288,16 @@ Planning assumptions, not benchmarks:
   `calibration/interface.py` and `calibration/homography.py` module
   docstrings.
 - **Phases 6–12:** not started; each depends on an earlier blocked phase.
+
+### Addendum (2026-08-29, later same day): calibration evaluator
+
+`evaluation.calibration` now implements the "Calibration" and "Reliability"
+metrics from this document's "Metrics and acceptance" section (reprojection
+error summary, valid-calibration coverage, selective risk/coverage curve,
+abstention rate by failure reason) against synthetic
+`HomographyEstimate`/held-out-error fixtures — see
+`tests/test_calibration_evaluation.py` and the architecture.md decision
+register. The ECE-style "calibration error" metric named in that section is
+explicitly deferred; see the same decision register entry for why. This is
+still evaluation-methodology infrastructure, not a real-footage calibration
+accuracy result — no such result exists yet.
