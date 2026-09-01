@@ -312,3 +312,16 @@ and the architecture.md decision register. As with the calibration evaluator,
 this is evaluation-methodology infrastructure only; no real-footage shape
 accuracy result exists yet, since `tactics.shape.calculate_shape_metrics` has
 not been run against anything but synthetic observations.
+
+### Addendum (2026-08-29, later same day): detection evaluator
+
+`evaluation.detection` now implements the "Detection" metrics from this
+document's "Metrics and acceptance" section (precision, recall, mAP by class
+and visibility subset) against synthetic `Detection` fixtures — see
+`tests/test_detection_evaluation.py` and the architecture.md decision
+register. As with the calibration and shape evaluators, this is
+evaluation-methodology infrastructure only: no real-footage detection
+precision/recall/mAP result exists yet, since there is no detector
+implementation or real annotated footage in this repository. AP values in the
+test suite are hand-computable, deterministic properties of synthetic boxes,
+not benchmark results.

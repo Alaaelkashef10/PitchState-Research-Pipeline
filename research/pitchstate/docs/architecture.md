@@ -282,3 +282,47 @@ metric — a system can have real per-frame numeric error while still
 correctly tracking whether a team is widening or narrowing, which is often
 the more decision-relevant signal for a downstream analyst. Implementing only
 raw error would silently drop that half of the specified metric.
+
+### Detection evaluator uses VOC-style AP and an ignore convention for visibility subsets (2026-08-29)
+
+**Decision:** add `evaluation.detection`, implementing `bounding_box_iou`,
+confidence-ordered greedy per-category matching
+(`match_detections_single_category`), `precision_recall_at_threshold`,
+VOC 2010+ continuous-interpolation `average_precision` /
+`mean_average_precision`, and `average_precision_by_visibility`, which scores
+one ground-truth visibility bin (e.g. an occlusion level) while treating a
+prediction that matches a real reference *outside* that bin as ignored,
+neither a true positive nor a false positive.
+
+**Alternatives:** (a) 11-point interpolated AP (the older PASCAL VOC
+convention) instead of continuous all-points interpolation; (b) score
+visibility subsets by simply filtering the reference set and counting any
+non-matching prediction as a false positive; (c) implement only an
+overall/single-threshold precision-recall metric, skipping AP/mAP entirely.
+
+**Reason for (a) not chosen:** continuous all-points interpolation is exact
+given the actual observed recall values (no grid-approximation error), is
+no harder to implement correctly, and is the interpolation method used by
+modern benchmarks (e.g. COCO's building blocks); 11-point interpolation was
+only a historical concession to compute costs from 2007-era hardware that
+does not apply here.
+
+**Reason for (b) not chosen:** research-plan.md's dataset-strategy section
+already commits to treating shot/replay/visibility annotation quality as
+first-class ("record shot/replay status and visibility quality"). If a
+detector correctly finds a real, heavily-occluded player while a caller is
+scoring the "fully visible" subset, counting that as a false positive would
+punish the detector for a correct detection that simply isn't a member of
+the subset being measured — it would make the subset AP numbers reflect subset
+membership noise rather than detector quality. The ignore convention (used by
+COCO-style benchmarks for exactly this reason) is implemented instead:
+out-of-subset matches are excluded from the precision/recall curve entirely.
+`test_match_on_out_of_subset_reference_is_ignored_not_penalized` in
+`tests/test_detection_evaluation.py` demonstrates the distinction directly.
+
+**Reason for (c) not chosen:** research-plan.md's Detection metrics line
+explicitly names "mAP by class and visibility subset" alongside
+precision/recall — omitting AP would leave the module short of what was
+specified, and `precision_recall_at_threshold` alone cannot answer
+"how good is this detector across all operating points," which is the
+question AP is for.
