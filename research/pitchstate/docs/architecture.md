@@ -326,3 +326,56 @@ precision/recall — omitting AP would leave the module short of what was
 specified, and `precision_recall_at_threshold` alone cannot answer
 "how good is this detector across all operating points," which is the
 question AP is for.
+
+### Tracking evaluator implements the full HOTA/DetA/AssA/IDF1 definitions with two documented, honest approximations (2026-08-29)
+
+**Decision:** add `evaluation.tracking`, implementing the TrackEval-style
+HOTA/DetA/AssA definitions exactly (`detection_accuracy`,
+`association_accuracy`, `hota_at_threshold`, `hota_summary` over the standard
+0.05-0.95 threshold sweep), the standard IDF1 formula via an exact global
+identity assignment (`identity_metrics`), and per-track ID switches,
+fragmentation, coverage, and gap-recovery (`track_quality_reports`). Two
+approximations are made, both documented in the module docstring rather than
+silently accepted: (1) per-frame matching uses the same confidence-ordered
+greedy IoU assignment as `evaluation.detection`, not the Hungarian-algorithm
+optimum the official TrackEval implementation uses; (2) `identity_metrics`'s
+global identity assignment is found by exhaustive permutation search
+(exact, but factorial in identity count), capped at `DEFAULT_MAX_IDENTITIES
+= 6` by default, rather than the Hungarian algorithm.
+
+**Alternatives:** (a) implement a pure-Python Hungarian algorithm to make
+both matching steps exactly match the official protocol; (b) implement only
+ID switches/fragmentation/coverage and skip HOTA/DetA/AssA/IDF1 entirely,
+citing the missing Hungarian solver as a blocker; (c) approximate HOTA/IDF1
+with informal heuristics not tied to the published formulas.
+
+**Reason for (a) not chosen:** a correct, general Hungarian algorithm is a
+substantial, error-prone piece of numerical code to hand-write and verify in
+pure Python; the greedy-matching approximation it would replace is already
+proven exact for every unambiguous configuration (the only case where greedy
+and optimal differ is when multiple candidates compete for the same box
+within one frame), and every test fixture in
+`tests/test_tracking_evaluation.py` is deliberately unambiguous so the
+computed values are exact under either method. Given no real detector or
+tracker exists in this repository yet to feed this evaluator, spending
+significant effort on Hungarian-algorithm correctness now would not currently
+change any measured result. This is documented as a real limitation to
+revisit if evaluation ever needs genuinely ambiguous real-world frames.
+
+**Reason for (b) not chosen:** the user explicitly requested the actual
+metrics (HOTA, DetA, AssA, IDF1), not placeholder APIs; research-plan.md
+also names them explicitly in its "Tracking" metrics line. Implementing them
+with a documented, bounded approximation is more useful and more honest than
+omitting them outright, since the approximation's exact boundary conditions
+(ambiguous per-frame matches; >6 identities) are stated plainly rather than
+hidden.
+
+**Reason for (c) not chosen:** using the actual published TrackEval/IDF1
+formulas (rather than an ad hoc heuristic) is what makes the hand-computed
+test fixtures in `tests/test_tracking_evaluation.py` — perfect tracking,
+missed detections, an induced ID switch, and an induced fragmentation with
+successful/failed recovery — independently verifiable: each expected value
+was derived from the formula definitions, not fit to whatever the code
+happened to produce. An ad hoc heuristic would not have that property and
+would risk producing numbers that look plausible but do not mean what they
+claim to mean.

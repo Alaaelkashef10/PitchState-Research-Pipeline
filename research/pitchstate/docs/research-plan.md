@@ -325,3 +325,18 @@ precision/recall/mAP result exists yet, since there is no detector
 implementation or real annotated footage in this repository. AP values in the
 test suite are hand-computable, deterministic properties of synthetic boxes,
 not benchmark results.
+
+### Addendum (2026-08-29, later same day): tracking evaluator
+
+`evaluation.tracking` now implements the "Tracking" metrics from this
+document's "Metrics and acceptance" section: HOTA, DetA, AssA, IDF1, ID
+switches, fragmentation, track duration, and recovery after occlusion —
+against synthetic `TrackObservation` fixtures covering perfect tracking,
+missed detections, an induced identity switch, and an induced fragmentation
+with both successful and failed recovery — see
+`tests/test_tracking_evaluation.py` and the architecture.md decision
+register for the two documented approximations (greedy per-frame matching;
+permutation-search identity assignment capped at 6 identities per side). As
+with the other evaluators, this is evaluation-methodology infrastructure
+only: no real tracker or footage exists in this repository, so no football
+tracking accuracy claim is made anywhere in this module or its tests.
